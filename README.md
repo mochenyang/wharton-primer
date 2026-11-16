@@ -1,5 +1,50 @@
 # Primer
 
+## For adaptation
+
+This fork adds an example experience and notes for adapting Primer to new teaching cases.
+
+### Example experience: anomaly detection in Python
+
+[`example/`](example/) contains a ready-to-install experience built from a business case:
+
+| Path | What it is |
+|------|------------|
+| `example/Call Center Staffing Analytics.pdf` | The source case: is a call center manager showing favoritism? |
+| `example/call-center.csv` | The case dataset (400 employee records, 10 features) |
+| `example/anomaly-detection-experience/` | Source files for the experience (edit these) |
+| `example/anomaly-detection-experience.zip` | The packaged experience, ready to upload |
+
+**To try it:** start Primer (`npm run dev`), click **Install Experience** on the Experiences page, and choose the zip. Learners need [Google Colab](https://colab.research.google.com) open and `call-center.csv` uploaded to it. The dataset isn't inside the zip, because experiences can only include Markdown and checklist files, so give it to learners separately.
+
+**How it plays (about 30–40 minutes, by voice or typing).** There are three agents:
+1. **Case Briefing** introduces the case and checks the learner is set up.
+2. **Dr. Priya Nand**, a data scientist, coaches the learner through five steps in Colab: load and inspect, data quality (9 duplicate Employee IDs), z-score screening of one feature at a time, Isolation Forest across all features, and a robustness check.
+3. **Judge Eleanor Marsh** cross-examines the learner's conclusion and gives a debrief.
+
+Primer can't run Python, so learners run the code themselves and report results. The tutor checks those results against `resources/instructions/supplemental/referenceResults.md`. That file was computed from the dataset with the same starter code learners use. The lesson the experience builds toward:
+- Employee **143406** is the strongest anomaly on all features combined, but no single-feature z-score screen catches them.
+- Employee **137155** is unusual because they're a top performer, which shows that an anomaly isn't necessarily wrongdoing.
+- There's no evidence of a systematically favored group.
+
+**To rebuild the zip after editing**, run this from inside the experience folder, so that `experience.json` ends up at the zip root:
+
+```bash
+cd example/anomaly-detection-experience
+python3 -m zipfile -c ../anomaly-detection-experience.zip experience.json resources
+```
+
+### How checklists work
+
+- **Definition.** A checklist is a Markdown file of `- [ ]` lines, declared in `experience.json` as an artifact with `"type": "checklist"`.
+- **One copy per session.** When a session starts, the file is copied to `storage/<experienceId>/session_data/<sessionId>/artifacts/`. The template itself never changes.
+- **Ticking an item.** The agent calls `checklist({ action: 'check', itemText: '...' })`. The tool runs in the browser ([`checklist-tool.ts`](src/app/lib/tools/builtin/checklist-tool.ts)). It finds the first line *containing* `itemText`, changes `- [ ]` to `- [x]`, and saves the file through `/api/artifacts/<id>/update`, which also keeps a revision history.
+  - If no line matches, the tool returns the exact item texts so the agent can retry.
+  - Keep item texts distinct, because matching is by substring.
+- **Deciding when an item is done.** No code makes this decision. The agent (the LLM) checks an item when the conversation and its instructions lead it to conclude the step is finished. It can't see the learner's screen, so it relies on what the learner reports. For more consistent behavior, write explicit completion criteria for each item into the agent's instructions, for example: "check this off only after the learner reports X and explains Y."
+
+---
+
 **Primer** is an experimental platform for creating interactive AI experiences that combine voice, visuals, and autonomous decision-making. Think of it as a runtime that plays "experiences" - self-contained interactive scenarios where AI agents can talk with you using realistic voice, display contextual images and scenes, make autonomous decisions about what happens next, and use various tools like showing notes, generating images, or searching the web.
 
 Each experience is defined by a configuration file that specifies the AI agents involved (their personalities, voices, instructions), visual scenes and sound effects, how agents flow from one to another, and what tools they can use. It's essentially a framework for creating rich, multi-modal AI interactions that go beyond simple chat - more like interactive AI-driven experiences or games.

@@ -1,0 +1,99 @@
+{
+  "configVersion": 2,
+  "version": "1.0.0",
+  "title": "The Favoritism Files: Anomaly Detection in Python",
+  "description": "Investigate rumors of favoritism at a call center by finding anomalous employees in Python (z-scores, then Isolation Forest), then defend your evidence before a skeptical judge.",
+  "author": "mochenyang",
+  "created": "2026-11-16T00:00:00.000Z",
+  "aiConfigurations": {
+    "default": {
+      "provider": "openai",
+      "api": "realtime",
+      "model": "gpt-realtime-1.5",
+      "streaming": true,
+      "modalities": ["audio", "text"],
+      "realtimeSettings": {
+        "silence_duration_ms": 1500,
+        "threshold": 0.7,
+        "prefix_padding_ms": 300,
+        "create_response": true,
+        "interrupt_response": true
+      }
+    }
+  },
+  "toolSets": {},
+  "resources": {
+    "scenes": [
+      "resources/scenes/case_briefing.png",
+      "resources/scenes/data_lab.png",
+      "resources/scenes/courtroom.png"
+    ],
+    "instructions": {
+      "agent": {
+        "narrator": "resources/instructions/agent/narrator.md",
+        "tutor": "resources/instructions/agent/tutor.md",
+        "judge": "resources/instructions/agent/judge.md"
+      },
+      "supplemental": {
+        "shared": "resources/instructions/supplemental/shared.md",
+        "caseFacts": "resources/instructions/supplemental/caseFacts.md",
+        "referenceResults": "resources/instructions/supplemental/referenceResults.md",
+        "confidentiality": "resources/instructions/supplemental/confidentiality.md"
+      }
+    },
+    "artifacts": [
+      {
+        "name": "Case Brief",
+        "type": "markdown",
+        "file": "resources/artifacts/case-brief.md",
+        "metadata": {
+          "description": "The case situation, key question, and data dictionary.",
+          "presentation": { "type": "slide" }
+        }
+      },
+      {
+        "name": "Colab Starter Code",
+        "type": "markdown",
+        "file": "resources/artifacts/starter-code.md",
+        "metadata": {
+          "description": "The full Python walkthrough, step by step, for Google Colab.",
+          "presentation": { "type": "slide" }
+        }
+      },
+      {
+        "name": "Analysis Checklist",
+        "type": "checklist",
+        "file": "resources/artifacts/analysis-checklist.md",
+        "agents": ["tutor"],
+        "metadata": {
+          "description": "Progress through the analysis steps.",
+          "presentation": { "type": "checklist", "options": {} }
+        }
+      }
+    ]
+  },
+  "agents": {
+    "narrator": {
+      "name": "Case Briefing",
+      "voice": "ballad",
+      "publicDescription": "A brisk narrator who sets up the call center favoritism case and gets the learner ready to analyze the data.",
+      "toolSets": ["default"],
+      "downstreamAgents": ["tutor"]
+    },
+    "tutor": {
+      "name": "Dr. Priya Nand, Data Scientist",
+      "voice": "marin",
+      "publicDescription": "A friendly data scientist who coaches the learner through anomaly detection in Python, one step at a time.",
+      "toolSets": ["default"],
+      "downstreamAgents": ["judge"]
+    },
+    "judge": {
+      "name": "Judge Eleanor Marsh",
+      "voice": "sage",
+      "publicDescription": "A sharp, skeptical judge who asks the learner to present and defend their statistical evidence.",
+      "toolSets": ["default"],
+      "downstreamAgents": []
+    }
+  },
+  "initialAgent": "narrator"
+}
